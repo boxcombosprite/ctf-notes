@@ -82,9 +82,9 @@ print("[+] payload response: ", client.recv(1024))
 client.close()
 ```
 
-on the box i land as `lp` with not much perms. the first thing i check are internal services. here there is one on `1337` and `9100`. 1337 is just the internal port for the website that was being proxied by nginx. `9100` is more interesting, as it seems to be a custom `printdirect` service running by user `archivist`
+on the box i land as `lp` with not much perms. the first thing i check are internal services. here there is one on `1337` and `9100`. 1337 is just the internal port for the website that was being proxied by nginx. `9100` is more interesting, as it seems to be a custom `jetdirect` service running by user `archivist`
 
-looking into that protocol, it seems printdirect is a simplistic protocol that you can just send postscript (pcl) to for print jobs. not sure really how to exploit this, i looked around more on the system. there are a couple custom services, one of which is the `paperwork.service` which starts `/usr/bin/paperwork-daemon`.
+looking into that protocol, it seems jetdirect is a simplistic protocol that you can just send postscript (pcl) to for print jobs. not sure really how to exploit this, i looked around more on the system. there are a couple custom services, one of which is the `paperwork.service` which starts `/usr/bin/paperwork-daemon`.
 
 that script is readable to us, and it seems like a way for users to check for malicious actions on the archive service. it scans the logs for certain commands, and if it finds them sends some evidence back over the unix socket. if the logs were clean, we get a "signature" made from a hash of `SYSTEM_CLEAN:<admin_pass>`. the important thing to notice in this script is that it loads this sensitive `admin_pins.conf` file that we can't read, even once we get to archivist. exploiting this script is the path to root after we escalate to `archivist`.
 
