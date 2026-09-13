@@ -171,7 +171,7 @@ select rootdn_passwd from glpi_authldaps;
 
 it's a base64 encoded blob of 92 bytes. doesn't look like a hash, so it's probably encrypted
 
-in the glpi source code, grepping for rootdn_password leads us to this GLPIKey class that's used to encrpyt and decrypt keys across GLPI. we can see it uses AEAD_xChaCha20Poly1305 from libsodium
+in the glpi source code, grepping for rootdn_password leads us to this GLPIKey class that's used to encrpyt and decrypt keys across GLPI. we can see it uses AEAD_xChaCha20Poly1305 via sodium
 
 glpi/src/GLPIKey.php
 ```php
@@ -213,6 +213,11 @@ which yields us a password that also works the the user `owen`
 ## root
 
 checking `sudo -l` reveals we can run this rdiff-backup command with nopasswd as root, and we need to supply some arguments
+
+```
+User owen may run the following commands on management:
+    (root) NOPASSWD: /usr/bin/rdiff-backup --server --restrict-path /opt/backup --restrict-mode read-only *
+```
 
 rdiff-backup is a script for doing differential backups.
 
